@@ -23,25 +23,25 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "os"
-    "gopkg.in/urfave/cli.v1"
+	"fmt"
+	"gopkg.in/urfave/cli.v1"
+	"log"
+	"os"
 )
 
 func main() {
-  app := cli.NewApp()
+	app := cli.NewApp()
 
-  app.Name = "UFABCLI"
-  app.Usage = "13"
+	app.Name = "UFABC - CLI"
+	app.Usage = "13"
 
-  app.Action = func(c *cli.Context) error {
-    fmt.Println("asdajkdajd")
-    return nil
-  }
+	app.Action = func(c *cli.Context) error {
+		fmt.Println("asdajkdajd")
+		return nil
+	}
 
-  err := app.Run(os.Args)
-  if err != nil {
-    log.Fatal(err)
-  }
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
