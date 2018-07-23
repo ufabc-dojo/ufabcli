@@ -1,6 +1,7 @@
 # ufabcli - Lula in your terminal
 
 ![UFABC Gopher](https://i.imgur.com/YsrQsm0.png)
+_Gopher image by [Renee French](https://reneefrench.blogspot.com/), licensed under [Creative Commons 3.0 Attributions license](https://creativecommons.org/licenses/by/3.0/)._
 
 <p align="center">
     <strong>ufabc-cli toolkit</strong>
@@ -28,7 +29,7 @@
 
 ### :wrench: built with
 
-- Golang
+- [golang](https://github.com/golang/go)
 
 
 ---
