@@ -4,41 +4,58 @@ const child_process = require('child_process');
 const http = require('http');
 const cheerio = require('cheerio');
 
+const { ArgumentParser, ArgumentTypeError } = require('argparse');
+
 const ru = require('./commands/ru.js');
 
-const printUsage = () => {
-    console.log("ufabcli by ufabc.dojo");
-    console.log("a ferramenta para o rato de computacao sobreviver na universidade do seculo xxi");
-}
-
-const menu = child_process.spawn('rofi', ['-i', '-dmenu', '-p', 'ufabcli', '-format', 'i']);
-menu.stdin.write("ru: Restaurante Universitario - Hoje\n");
-menu.stdin.write("ru: Restaurante Universitario - Semana\n");
-menu.stdin.write("aulas: Aulas de Hoje\n");
-menu.stdin.end();
-menu.stdout.on('data', (x) => {
-    if(x.toString() == 0) {
-        const d = new Date().getDay();
-        ru.thisWeek((list) => {
-            const gambi = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-            const oqTem = list[gambi[d]];
-            const str = `Almoco: ${oqTem.lunch}\nJantar: ${oqTem.diner}\nVegetariano: ${oqTem.veggie}\nGuarnicao: ${oqTem.garrison}\nSalada: ${oqTem.salad}\nSobremesa: ${oqTem.dessert}`;
-            const dialog = child_process.spawn('rofi', ['-e', str]);
-            dialog.stdin.end();
-        });
-    } else if(x.toString() == 1) {
-        ru.thisWeek((list) => {
-            const gambi = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-            const dayDialog = child_process.spawn('rofi', ['-i', '-dmenu', '-p', 'dia: ', '-format', 'i']);
-            dayDialog.stdin.write(gambi.join("\n"));
-            dayDialog.stdin.end();
-            dayDialog.stdout.on('data', (dayBinary) => {
-                const day = parseInt(dayBinary.toString());
-                const oqTem = list[gambi[day]];
-                const str = `Almoco: ${oqTem.lunch}\nJantar: ${oqTem.diner}\nVegetariano: ${oqTem.veggie}\nGuarnicao: ${oqTem.garrison}\nSalada: ${oqTem.salad}\nSobremesa: ${oqTem.dessert}`;
-                const dialog = child_process.spawn('rofi', ['-e', str]);
-                dialog.stdin.end();
-            })
-        });
-    }
+let parser = new ArgumentParser({
+    version: '0.0.1',
+    addHelp: true,
+    description: 'ufabcli - o app essencial para o rato de computacao'
 });
+
+let subparsers = parser.addSubparsers({
+    tile: 'subcomands',
+    dest: 'subcommand_name' // wtf
+});
+
+let ruParser = subparsers.addParser('ru', { addHelp: true });
+ruParser.addArgument(
+    ["-d", "--day"],
+    {
+        action: "store",
+        type: (x) => { if(x < 0 || x > 5) {
+            throw ArgumentTypeError(`${x} nao e um dia valido!`)
+        } else {
+            return ["mon", "tue", "wed", "thu", "fri", "sat"][x];
+        } },
+        help: 'O dia da semana. 0 = segunda, 5 = sabado'
+    }
+);
+ruParser.addArgument(
+    ["-m", "--meal"],
+    {
+        action: "store",
+        type: (x) => {
+            if (["lunch", "diner", "veggie", "garrison", "salad", "dessert"].indexOf(x) == -1) {
+                throw ArgumentTypeError(`${x} nao e uma refeicao valida!`);
+            } else {
+                return x;
+            }
+        },
+        help: 'A refeicao. Pode ser [lunch, diner, veggie, garrison, salad, dessert]'
+    }
+)
+
+const main = async () => {
+    const args = parser.parseArgs();
+
+    switch(args.subcommand_name) {
+        case 'ru':
+            const menu = await ru.thisWeek();
+            return menu[args.day][args.meal];
+            break;
+    }
+};
+
+main().then(console.log);

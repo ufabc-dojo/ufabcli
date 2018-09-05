@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "UNLICENSE",
+  "license": "MIT",
   "dependencies": {
     "argparse": "^1.0.10",
     "cheerio": "^1.0.0-rc.2",
